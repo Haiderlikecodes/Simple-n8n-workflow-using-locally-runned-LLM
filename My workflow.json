@@ -1,0 +1,157 @@
+{
+  "name": "Haider's workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "c0499de6-8ea1-45b1-b996-5f534a70d226",
+      "name": "When chat message received",
+      "webhookId": "1049048b-702f-4cec-b5ff-88237822373f"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Summarize the following email in 2-3 key bullet points:\n\nFrom: {{ $json.from }}\nSubject: {{ $json.subject }}\nBody: {{ $json.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        384,
+        0
+      ],
+      "id": "998ed7c4-91e6-4f1a-a77c-0bb157dff673",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "my-qwen-0.5b:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        256,
+        208
+      ],
+      "id": "c8d2ad3d-204d-46e6-a19e-9b0215a134b9",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "lNnbRhy8tGJ7Ta0w",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        -32
+      ],
+      "id": "27ed325f-4374-449d-b868-ff5819a5f226",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "2vnJWuEdarzEvV0r",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "Test",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        16
+      ],
+      "id": "ba368204-aa66-4018-9a3b-d216fa728bd2",
+      "name": "Create a draft",
+      "webhookId": "b03d468f-8120-41bc-aa60-546bf707cb7e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "2vnJWuEdarzEvV0r",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "a36d0505-ebc9-4267-bdf4-f9b7c8ca4524",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2d5203576fc6bf534bdb0011a6fbd2ea987891445fb2a183853c68a366919bf6"
+  },
+  "nodeGroups": [],
+  "id": "t0VjYHRJohwh57WF",
+  "tags": []
+}
